@@ -44,6 +44,11 @@ jobs:
           x=$(curl -X POST -H "content-type:application/json" -d '{"swaggerUrl":"https://raw.githubusercontent.com/Tyav/simple-npm-package/main/spec/api-spec.yaml"}' https://generator.swagger.io/api/gen/clients/typescript-node)
           link=$(echo $x | grep -o '"link":"[^"]*' | grep -o '[^"]*$')
           echo $link
+          wget -c $link -O d_pack.zip
+          unzip d_pack.zip -d d_pack
+          cd d_pack
+          ls
+          
       # - uses: actions/setup-node@v3
       #   with:
       #     node-version: 14

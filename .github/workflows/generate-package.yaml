@@ -47,7 +47,9 @@ jobs:
           wget -c $link -O d_pack.zip
           unzip d_pack.zip -d d_pack
           cd d_pack
-          ls
+      
+      - name: Confirm file still exist
+        run: ls
           
       # - uses: actions/setup-node@v3
       #   with:

@@ -1,0 +1,71 @@
+swagger: '2.0'
+
+info:
+  version: 1.0.0
+  title: "ViteRida Authentication Service API"
+  description: |
+
+    ViteRidas Authentication servive API endpoints
+    This service generates auth tokens for users and internal services.
+
+  contact:
+    name: "ViteRidas"
+    email: "dev@viterida.africa"
+
+x-service-id: authentication
+x-organization: core
+
+basePath: /
+host: authentication.core.viterida.com
+schemes:
+  - "https"
+  - "http"
+
+consumes:
+  - "application/json"
+produces:
+  - "application/json"
+
+tags:
+  - name: Users
+    description: "User related endpoints"
+
+paths:
+  /:
+    get:
+      tags:
+        - "Users"
+      summary: "Generates a user token"
+      operationId: generateUserAuthToken
+      responses:
+        "200":
+          description: "Success"
+          schema:
+            $ref: "#/definitions/UserTokenResponse"
+
+definitions:
+  UserTokenResponse:
+    type: "object"
+    required:
+      - userId
+      - token
+      - sessionId
+    properties:
+      userId:
+        type: "string"
+        description: "User ID"
+        format: "uuid"
+      sessionId:
+        type: string
+        format: uuid
+        description: session attached to this token, can be used to invalidate token
+      token:
+        type: "string"
+        description: "User JWT token"
+      scopes:
+        type: "array"
+        description: "Scopes included in the token"
+        items:
+          type: "string"
+          example: "auth.*"
+

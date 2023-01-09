@@ -1,0 +1,62 @@
+name: Node.js Package
+
+on: push
+
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Set registry
+        run: echo "//npm.pkg.github.com/:_authToken=$GITHUB_TOKEN" >> $HOME/.npmrc
+        env:
+          GITHUB_TOKEN: ${{secrets.GH_PUBLISH_TOKEN}}
+          GITHUB_OWNER: tyav
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 14  
+      - name: Install dependencies
+        run: |
+          if [ -e yarn.lock ]; then
+          yarn install --frozen-lockfile
+          elif [ -e package-lock.json ]; then
+          npm ci
+          else
+          npm i
+          fi
+
+  publish-gpr:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      packages: write
+      contents: read
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 1
+      - run: |
+        x=$(curl -X POST -H "content-type:application/json" -d '{"swaggerUrl":"https://raw.githubusercontent.com/Tyav/simple-npm-package/main/spec/api-spec.yaml"}' https://generator.swagger.io/api/gen/clients/typescript-node)
+        wait $x
+        link=$(echo $x | grep -o '"link":"[^"]*' | grep -o '[^"]*$')
+        echo $link
+      # - uses: actions/setup-node@v3
+      #   with:
+      #     node-version: 14
+      #     registry-url: https://npm.pkg.github.com/
+      # - name: Install dependencies
+      #   run: |
+      #     if [ -e yarn.lock ]; then
+      #     yarn install --frozen-lockfile
+      #     elif [ -e package-lock.json ]; then
+      #     npm ci
+      #     else
+      #     npm i
+      #     fi
+      # - run: npm publish
+      #   env:
+      #     NODE_AUTH_TOKEN: ${{secrets.GH_PUBLISH_TOKEN}}
